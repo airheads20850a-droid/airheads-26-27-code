@@ -7,9 +7,6 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-"""teleop but we have a cascade lift"""
-
-
 # Library imports
 from vex import *
 
@@ -17,19 +14,20 @@ brain = Brain()
 controller_1 = Controller(PRIMARY)
 
 # ports
-"""LEFT and RIGHT are determined by looking at the robot in the perpsective where the claw is facing you"""
+"""LEFT and RIGHT are determined by looking at the robot in the perpsective where the clamp is facing you"""
 
 # drivetrain
-motor_FR = Motor(Ports.PORT6, GearSetting.RATIO_6_1, True)
-motor_MR = Motor(Ports.PORT15, GearSetting.RATIO_6_1, True); "'middle' ones are the 5.5W motors"
-motor_BR = Motor(Ports.PORT16, GearSetting.RATIO_6_1, True)
-motor_FL = Motor(Ports.PORT5, GearSetting.RATIO_6_1, False)
-motor_ML = Motor(Ports.PORT7, GearSetting.RATIO_6_1, False)
-motor_BL = Motor(Ports.PORT18, GearSetting.RATIO_6_1, False)
+"""are these ratios right lmao"""
+motor_FL = Motor(Ports.PORT11, GearSetting.RATIO_6_1, True)
+motor_ML = Motor(Ports.PORT3, GearSetting.RATIO_6_1, True); "'middle' ones are the 5.5W motors"
+motor_BL = Motor(Ports.PORT20, GearSetting.RATIO_6_1, True)
+motor_FR = Motor(Ports.PORT12, GearSetting.RATIO_6_1, False)
+motor_MR = Motor(Ports.PORT14, GearSetting.RATIO_6_1, False)
+motor_BR = Motor(Ports.PORT6, GearSetting.RATIO_6_1, False)
 
-# cascade
-lift_R = Motor(Ports.PORT12, GearSetting.RATIO_36_1, True)
-lift_L = Motor(Ports.PORT20, GearSetting.RATIO_36_1, False)
+# d4br``
+lift_L = Motor(Ports.PORT16, GearSetting.RATIO_36_1, False)
+lift_R = Motor(Ports.PORT18, GearSetting.RATIO_36_1, False)
 
 # intake
 intakeMotor = Motor(Ports.PORT9, GearSetting.RATIO_36_1, True)
@@ -43,8 +41,8 @@ dx = 20
 # lift shenanigans
 lift_L.set_position(0, DEGREES)
 lift_R.set_position(0, DEGREES)
-lift_L.set_max_torque(50, PERCENT)
-lift_R.set_max_torque(50, PERCENT)
+lift_L.set_max_torque(40, PERCENT)
+lift_R.set_max_torque(40, PERCENT)
 #liftV = 100
 #lift_L.set_velocity(liftV)
 #lift_R.set_velocity(liftV)
@@ -181,8 +179,8 @@ def drive():     #Threaded function to drive motors based on controller input
         #calculates left and right drivetrain velocity based on inputs and turn velocity
 
         forwardV = inputCurve(controller_1.axis3.position()/100,a,b,c,d,p)
-        leftV = -100*forwardV + turnVelocity * -controller_1.axis1.position()/100
-        rightV = -100*forwardV - turnVelocity * -controller_1.axis1.position() /100
+        leftV = 100*forwardV + turnVelocity * controller_1.axis1.position()/100
+        rightV = 100*forwardV - turnVelocity * controller_1.axis1.position() /100
 
         #note: axis3 is the forward axis and axis1 is the turning axis.
 
@@ -217,14 +215,14 @@ def drive():     #Threaded function to drive motors based on controller input
         #prevents the loop from taking up all the brains resources.
         wait(15, MSEC)
 
-"""logarithmic speed?"""
+"""logarithmic speed"""
 # controls the double reverse 4 bar lift
 def d4rb():
 
 
     intendedDegree = 0
-    lift_L.set_velocity(100)
-    lift_R.set_velocity(100)
+    lift_L.set_velocity(50)
+    lift_R.set_velocity(50)
 
     """def needs to be changed"""
     maxLiftDegree = 175 #basically what degree the motors would be if the d4rb was extended to full height (~4.5 cup/pin stack)
@@ -237,7 +235,7 @@ def d4rb():
 
 
         # go UP
-        if (controller_1.buttonL1.pressing()):
+        if (controller_1.buttonUp.pressing()):
 
             #intendedDegree += (liftV/100*762/(1000/dx))*2 # convert velocity to degrees/ms
 
@@ -253,7 +251,7 @@ def d4rb():
             lift_R.spin(FORWARD)
 
         #go DOWN
-        elif (controller_1.buttonL2.pressing()):
+        elif (controller_1.buttonLeft.pressing()):
             
 
 
@@ -264,15 +262,10 @@ def d4rb():
 
             intendedDegree = 0
 
-            #print(intendedDegree)
-            lift_L.spin(REVERSE)
-            lift_R.spin(REVERSE)
+            print(intendedDegree)
+            lift_L.spin_to_position(intendedDegree, DEGREES)
+            lift_R.spin_to_position(intendedDegree, DEGREES)
 
-            #lift_L.spin(REVERSE)
-            #lift_R.spin(REVERSE)
-        else:
-            lift_L.stop()
-            lift_R.stop()
 
         # PID loop to keep position in place?
 
@@ -290,33 +283,16 @@ def intake():
         wait(20, MSEC)
 
 # controls the claw
-
 def claw():
 
-    clamping = False
-    delay = False
-    
+    #clamping = False
 
     while True:
-        if (controller_1.buttonR1.pressing() and not delay):
-
-            if (not clamping):
-                clawP.set(True)
-                clamping = True
-
-            elif (clamping):
-                clawP.set(False)
-                clamping = False
-
-            delay = True
-        elif (not controller_1.buttonR1.pressing() and delay):
-            delay = False
-
-        """if (controller_1.buttonX.pressing()):
+        if (controller_1.buttonX.pressing()):
             clawP.set(True)
         elif (controller_1.buttonY.pressing()):
-            clawP.set(False)"""
-        wait(15, MSEC)
+            clawP.set(False)
+        wait(20, MSEC)
 
 
 def autonomous():
