@@ -5,7 +5,7 @@ pros::MotorGroup left_motors({-4, -7, -16});
 pros::MotorGroup right_motors({1, 15, 6});
 
 pros::Motor liftL(20, pros::v5::MotorGears::green);
-pros::Motor liftR(12, pros::v5::MotorGears::green);
+pros::Motor liftR(-12, pros::v5::MotorGears::green);
 
 pros::adi::DigitalOut claw('H');
 
@@ -183,6 +183,7 @@ void competition_initialize() {}
 void autonomous() {
 	// set position to x:0, y:0, heading:0
     chassis.setPose(0, 0, 0);
+
     // turn to face heading 90 with a very long timeout
     //chassis.waitUntilDone();
 
@@ -201,34 +202,32 @@ void autonomous() {
     
     // score preload
     chassis.moveToPose(0, 15, 0, 1000);
-    pros::delay(500);
     chassis.moveToPose(0, 15, 90, 1000);
-    chassis.moveToPoint(16.5, 15, 500, {.maxSpeed = 50});
-    //chassis.moveToPoint(20, 15, 500);
-
-
+    chassis.moveToPoint(16.5, 15, 500, {.maxSpeed = 60});
     chassis.waitUntilDone();
-    master.print(0, 0, "5");
 
     pros::delay(1000);
 
     open_claw();
     pros::delay(500);
 
+    // score cup + pin
     chassis.moveToPoint(0, 15, 1000, {.forwards = false});
-    chassis.moveToPose(0, 15, 41, 1000);
-    chassis.setPose(0, 0, 0);
-    chassis.moveToPoint(16.5, 15, 1000, {.maxSpeed = 50});
+    chassis.moveToPose(0, 15, 45*0.78, 1000);
+    chassis.waitUntilDone();
+    chassis.setPose(0, 0, 45);
+    chassis.moveToPoint(18.5, 17, 1000, {.maxSpeed = 50});
     chassis.waitUntilDone();
     close_claw();
 
-    chassis.moveToPoint(17, 16, 1000);
+    chassis.moveToPoint(20, 18.5, 1000);
 
     lift_to(300);
     chassis.moveToPose(17, 16, 180, 1000);
     chassis.moveToPoint(17, 0, 1000);
 
     open_claw();
+
 }
 
 /**
