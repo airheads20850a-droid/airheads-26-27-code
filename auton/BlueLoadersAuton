@@ -99,6 +99,16 @@ void lift_to(int degrees) {
     liftR.move_absolute(degrees, 100);
 }
 
+void lift_move(int dir) {
+    liftL.move(127*dir);
+    liftR.move(127*dir);
+}
+
+void lift_stop(int degrees) {
+    liftL.brake();
+    liftR.brake();
+}
+
 void open_claw() {
     claw.set_value(HIGH); 
 }
@@ -137,6 +147,8 @@ void initialize() {
             pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
             pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
             pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            pros::lcd::print(3, "lfitL: %f", liftL.get_position()); // y
+            pros::lcd::print(4, "liftR: %f", liftR.get_position()); // heading
             master.print(1, 0, "X: %f", chassis.getPose().x); // x
             master.print(2, 0, "Y: %f", chassis.getPose().y); // y
             master.print(3, 0, "Theta: %f", chassis.getPose().theta); // heading
@@ -181,29 +193,35 @@ void competition_initialize() {}
  */
 
 void autonomous() {
-	// set position to x:0, y:0, heading:0
+    /*
+    lift_move(1);
+    pros::delay(2000);
+    lift_stop();
+
+    pros::delay(2000);
+    lift_move(-1);
+    pros::delay(2000);
+    lift_stop();
+
+    lift_to(900);
+    pros::delay(10000);
+	*/
+    // set position to x:0, y:0, heading:0
     chassis.setPose(0, 0, 0);
 
     // turn to face heading 90 with a very long timeout
     //chassis.waitUntilDone();
 
     // cycle loader to blue
-    master.print(0, 0, "1");
     chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
-
-    master.print(0, 0, "2");
     chassis.moveToPoint(0, -3, 500, {.forwards = false, .maxSpeed = 70}, false);
-
     chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
-    master.print(0, 0, "3");
-
     chassis.moveToPoint(0, -3, 500, {.forwards = false, .maxSpeed = 70}, false);
-    master.print(0, 0, "4");
     
     // score preload
     chassis.moveToPose(0, 15, 0, 1000);
     chassis.moveToPose(0, 15, 90, 1000);
-    chassis.moveToPoint(16.5, 15, 500, {.maxSpeed = 60});
+    chassis.moveToPoint(16.5, 15, 500, {.maxSpeed = 55});
     chassis.waitUntilDone();
 
     pros::delay(1000);
@@ -212,22 +230,31 @@ void autonomous() {
     pros::delay(500);
 
     // score cup + pin
-    chassis.moveToPoint(0, 15, 1000, {.forwards = false});
-    chassis.moveToPose(0, 15, 45*0.78, 1000);
+    chassis.moveToPoint(0, 13, 1000, {.forwards = false});
+    chassis.moveToPose(0, 13, 41, 1000);
     chassis.waitUntilDone();
-    chassis.setPose(0, 0, 45);
-    chassis.moveToPoint(18.5, 17, 1000, {.maxSpeed = 50});
+    chassis.setPose(0, 0, 35);
+    
+    chassis.moveToPoint(14.7, 21.3, 1500, {.maxSpeed = 50});
     chassis.waitUntilDone();
     close_claw();
 
-    chassis.moveToPoint(20, 18.5, 1000);
+    pros::delay(500);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(21.5, 30, 1000);
 
-    lift_to(300);
-    chassis.moveToPose(17, 16, 180, 1000);
-    chassis.moveToPoint(17, 0, 1000);
-
+    chassis.moveToPose(21.5, 30, 168, 1000);
+    lift_to(900);
+    chassis.moveToPoint(23, 12, 1000, {.maxSpeed = 60});
+    chassis.waitUntilDone();
+    pros::delay(1000);
     open_claw();
 
+    // 
+    pros::delay(600);
+    close_claw();
+    pros::delay(100);
+    lift_to(0);
 }
 
 /**
