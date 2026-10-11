@@ -206,51 +206,10 @@ void autonomous() {
     // set position to x:0, y:0, heading:0
     chassis.setPose(0, 0, 0);
 
-    /*chassis.setPose(10, 15, 90);
-    //chassis.moveToPose(10, 15, 135, 1000);
-    chassis.moveToPoint(10, 7.2, 10000, {.maxSpeed = 40});
-    chassis.moveToPoint(24, 7.2, 10000, {.minSpeed = 20});
-    chassis.moveToPoint(62, 6, 10000, {.maxSpeed = 50});
-    chassis.moveToPose(62,6,180,1000);
-    open_claw();
-    chassis.moveToPoint(62,-3,1000,{.maxSpeed = 40}, false);
-    close_claw();
-    lift_to(800);
-    chassis.moveToPoint(62,4,1000,{.forwards = false, .maxSpeed = 40}, false);
-    chassis.moveToPose(62,4,270,1000);
-    chassis.waitUntilDone();
-    chassis.moveToPoint(26,4, 1000, {.maxSpeed = 50});
-    chassis.waitUntilDone();
-    chassis.moveToPose(26,4,360,1000);
-    chassis.waitUntilDone();
-    chassis.moveToPoint(26,11,1000);
-    chassis.waitUntilDone();
-    lift_to(0);*/
+    //lift a little
+    lift_to(150);
 
-    // grab cup pin on the field
-    chassis.setPose(26, 11, 360);
-    open_claw();
-    pros::delay(500);
-    chassis.moveToPoint(26, 3, 1000, {.forwards = false, .maxSpeed = 70}, false);
-    chassis.turnToPoint(48, 10, 1000);
-    chassis.waitUntilDone();
-    chassis.moveToPoint(48, 15, 1000, {.maxSpeed = 40}, false);
-    close_claw();
-
-    // score it
-    lift_to(1500);
-
-    chassis.moveToPoint(26, 3, 1000, {.forwards = false, .maxSpeed = 40}, false);
-    chassis.moveToPose(26,3,360,1000);
-    chassis.waitUntilDone();
-    chassis.moveToPoint(26, 11, 1000, {.maxSpeed = 70}, false);
-    close_claw();
-
-
-
-
-
-    /*// cycle loader to bluex
+    // cycle loader to bluex
     chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
     chassis.moveToPoint(0, -3, 500, {.forwards = false, .maxSpeed = 70}, false);
     chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
@@ -260,48 +219,66 @@ void autonomous() {
     // score preload
     chassis.moveToPose(0, 16, 0, 1000);
     chassis.moveToPose(0, 16, 90, 1000);
-    chassis.moveToPoint(16.5, 15, 500, {.maxSpeed = 55});
-    chassis.waitUntilDone();
+    chassis.moveToPoint(16.5, 16, 500, {.maxSpeed = 55},false);
+    pros::delay(500);
+    open_claw();
     pros::delay(1000);
-    open_claw();
-
-    //**CODE OG TO SKILLS STARTS...untested...**
-
-    // pick up first match load
-    chassis.moveToPoint(10, 15, 1000, {.maxSpeed = 70});
-    chassis.moveToPose(10, 15, 135, 1000);
-    chassis.moveToPose(24, 5, 90, 1000, {.maxSpeed = 70});
-    chassis.moveToPoint(60, 15, 1000, {.maxSpeed = 70}, false);
-    chassis.moveToPose(60, 15, 180, 1000);
-    chassis.moveToPoint(60, 0, 1000, {.maxSpeed = 70}, false);
-    open_claw();
-    pros::delay(2000);
-    close_claw();
-
-    // score match load
-    chassis.moveToPoint(60, 8, 1000, {.forwards = false, .maxSpeed = 70}, false);
-    chassis.moveToPose(60, 8, 270, 1000);
-    // test this arc
-    chassis.moveToPose(40, 15, 0, 1000);
-    lift_to(900);
-    chassis.moveToPose(40, 15, -90, 1000);
-    chassis.moveToPoint(45, 15, 1000, {.maxSpeed = 70}, false);
-    open_claw();
-
-
-    // grab cup pin on the field
-    chassis.moveToPoint(40, 15, 1000, {.forwards = false, .maxSpeed = 70}, false);
     lift_to(0);
-    chassis.moveToPose(40, 15, 90, 1000);
-    chassis.moveToPoint(48, 15, 1000, {.maxSpeed = 70}, false);
+
+    // **CODE OG TO SKILLS STARTS**
+    // get a match load
+    chassis.moveToPoint(10,16,1000);
+    chassis.waitUntilDone();
+    chassis.setPose(10, 16, 90);
+    chassis.moveToPose(10, 16, 135, 1000);
+    chassis.moveToPoint(10, 7.7, 10000, {.maxSpeed = 40});
+    chassis.moveToPoint(24, 7.7, 10000, {.minSpeed = 20});
+    chassis.moveToPoint(60.5, 6, 10000, {.maxSpeed = 50});
+    chassis.moveToPose(60.5,6,180,1000);
+    chassis.moveToPoint(60.5,-3,1000,{.maxSpeed = 40}, false);
     close_claw();
 
     // score it
-    lift_to(900);
+    lift_to(100);
+    pros::delay(500);
+    chassis.moveToPoint(60.5,5,1000,{.forwards = false, .maxSpeed = 40}, false);
+    lift_to(800);
+    chassis.turnToPoint(24,3, 1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(24,3, 1000, {.maxSpeed = 50});
+    chassis.waitUntilDone();
+    chassis.moveToPose(24,3,0,1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(24,11,1000);
+    pros::delay(500);
+    open_claw();
+    chassis.waitUntilDone();
+    lift_to(0);
 
-    chassis.moveToPose(48, 15, -90, 1000);
-    chassis.moveToPoint(40, 15, 1000, {.maxSpeed = 70}, false);
-    open_claw();*/
+
+    // grab cup pin on the field
+    chassis.setPose(24, 11, 0);
+    chassis.moveToPoint(24, 0, 1000, {.forwards = false, .maxSpeed = 70}, false);
+    chassis.turnToPoint(48, 15, 1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(48, 15, 1000, {.maxSpeed = 40}, false);
+    close_claw();
+
+    // score it
+    lift_to(1300);
+    chassis.moveToPoint(28, 2, 1000, {.forwards = false, .maxSpeed = 40}, false);
+    chassis.moveToPose(28,2,0,1000);
+    chassis.waitUntilDone();
+    pros::delay(500);
+    chassis.moveToPoint(28, 11, 1000, {.maxSpeed = 60}, false);
+    pros::delay(500);
+    open_claw();
+    pros::delay(500);
+
+    // leave
+    close_claw();
+    lift_to(0);
+    chassis.moveToPoint(28,0,1000, {.forwards = false}, false);
 
 }
 
