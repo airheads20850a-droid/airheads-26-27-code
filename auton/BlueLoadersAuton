@@ -23,8 +23,8 @@ lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
                                               0, // integral gain (kI)
                                               15, // derivative gain (kD)
                                               0, // anti windup
-                                              0, // small error range, in inches
-                                              0, // small error range timeout, in milliseconds
+                                              1, // small error range, in inches
+                                              100, // small error range timeout, in milliseconds
                                               0, // large error range, in inches
                                               0, // large error range timeout, in milliseconds
                                               0 // maximum acceleration (slew)
@@ -35,8 +35,8 @@ lemlib::ControllerSettings angular_controller(1, // proportional gain (kP)
                                               0, // integral gain (kI)
                                               5, // derivative gain (kD)
                                               0, // anti windup
-                                              0, // small error range, in degrees
-                                              0, // small error range timeout, in milliseconds
+                                              1, // small error range, in degrees
+                                              100, // small error range timeout, in milliseconds
                                               0, // large error range, in degrees
                                               0, // large error range timeout, in milliseconds
                                               0 // maximum acceleration (slew)
@@ -208,10 +208,7 @@ void autonomous() {
 	*/
     // set position to x:0, y:0, heading:0
     chassis.setPose(0, 0, 0);
-
-    // turn to face heading 90 with a very long timeout
-    //chassis.waitUntilDone();
-
+    
     // cycle loader to blue
     chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
     chassis.moveToPoint(0, -3, 500, {.forwards = false, .maxSpeed = 70}, false);
@@ -219,8 +216,8 @@ void autonomous() {
     chassis.moveToPoint(0, -3, 500, {.forwards = false, .maxSpeed = 70}, false);
     
     // score preload
-    chassis.moveToPose(0, 15, 0, 1000);
-    chassis.moveToPose(0, 15, 90, 1000);
+    chassis.moveToPose(0, 16, 0, 1000);
+    chassis.moveToPose(0, 16, 90, 1000);
     chassis.moveToPoint(16.5, 15, 500, {.maxSpeed = 55});
     chassis.waitUntilDone();
 
@@ -231,16 +228,16 @@ void autonomous() {
 
     // score cup + pin
     chassis.moveToPoint(0, 13, 1000, {.forwards = false});
-    chassis.moveToPose(0, 13, 41, 1000);
+    chassis.moveToPose(0, 13, 45, 1800);
     chassis.waitUntilDone();
-    chassis.setPose(0, 0, 35);
+    inertial_sensor.set_heading(45);
+    chassis.setPose(0, 0, 45);
     
+    // grab it!!
     chassis.moveToPoint(14.7, 21.3, 1500, {.maxSpeed = 50});
     chassis.waitUntilDone();
     close_claw();
-
     pros::delay(500);
-    chassis.waitUntilDone();
     chassis.moveToPoint(21.5, 30, 1000);
 
     chassis.moveToPose(21.5, 30, 168, 1000);
@@ -255,6 +252,8 @@ void autonomous() {
     close_claw();
     pros::delay(100);
     lift_to(0);
+
+    chassis.moveToPoint(21.5, 30, 1000, {.forwards = false});
 }
 
 /**
