@@ -97,6 +97,16 @@ void on_center_button() {
 void lift_to(int degrees) {
     liftL.move_absolute(degrees, 100);
     liftR.move_absolute(degrees, 100);
+
+    //doesnt work lmao
+    /*while (!((liftR.get_position() + liftL.get_position()) / 2 > degrees - 5 &&
+           (liftL.get_position() + liftR.get_position()) / 2 < degrees + 5)) {
+      pros::lcd::print(5, "avg: %f",
+                       (liftL.get_position() + liftR.get_position()) /
+                           2);                     // heading
+      pros::lcd::print(6, "degrees: %f", degrees); // heading
+      pros::delay(50);
+    }*/
 }
 
 void lift_move(int dir) {
@@ -129,9 +139,6 @@ void initialize() {
 
     liftL.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
     liftR.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-
-    liftL.set_zero_position(0);
-    liftR.set_zero_position(0);
 
     std::cout << "left motors: %f" << left_motors.get_temperature() << "\nright motors: %f" << right_motors.get_temperature() << std::endl;
 
@@ -178,7 +185,10 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+    liftL.tare_position();
+    liftR.tare_position();
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -196,7 +206,7 @@ void autonomous() {
     // set position to x:0, y:0, heading:0
     chassis.setPose(0, 0, 0);
 
-    chassis.setPose(10, 15, 90);
+    /*chassis.setPose(10, 15, 90);
     //chassis.moveToPose(10, 15, 135, 1000);
     chassis.moveToPoint(10, 7.2, 10000, {.maxSpeed = 40});
     chassis.moveToPoint(24, 7.2, 10000, {.minSpeed = 20});
@@ -205,14 +215,41 @@ void autonomous() {
     open_claw();
     chassis.moveToPoint(62,-3,1000,{.maxSpeed = 40}, false);
     close_claw();
-    lift_to(100);
+    lift_to(800);
     chassis.moveToPoint(62,4,1000,{.forwards = false, .maxSpeed = 40}, false);
     chassis.moveToPose(62,4,270,1000);
-    chassis.moveToPoint(31,4, 1000, {.maxSpeed = 50});
-    chassis.moveToPose(31,4,360,1000);
-    chassis.moveToPoint(31,11,1000);
     chassis.waitUntilDone();
+    chassis.moveToPoint(26,4, 1000, {.maxSpeed = 50});
+    chassis.waitUntilDone();
+    chassis.moveToPose(26,4,360,1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(26,11,1000);
+    chassis.waitUntilDone();
+    lift_to(0);*/
+
+    // grab cup pin on the field
+    chassis.setPose(26, 11, 360);
     open_claw();
+    pros::delay(500);
+    chassis.moveToPoint(26, 3, 1000, {.forwards = false, .maxSpeed = 70}, false);
+    chassis.turnToPoint(48, 10, 1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(48, 15, 1000, {.maxSpeed = 40}, false);
+    close_claw();
+
+    // score it
+    lift_to(1500);
+
+    chassis.moveToPoint(26, 3, 1000, {.forwards = false, .maxSpeed = 40}, false);
+    chassis.moveToPose(26,3,360,1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(26, 11, 1000, {.maxSpeed = 70}, false);
+    close_claw();
+
+
+
+
+
     /*// cycle loader to bluex
     chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
     chassis.moveToPoint(0, -3, 500, {.forwards = false, .maxSpeed = 70}, false);
@@ -250,29 +287,6 @@ void autonomous() {
     chassis.moveToPose(40, 15, -90, 1000);
     chassis.moveToPoint(45, 15, 1000, {.maxSpeed = 70}, false);
     open_claw();
-
-
-
-    // pick up another (basically just the reverse)
-    chassis.moveToPoint(40, 15, 1000, {.forwards = false, .maxSpeed = 70}, false);
-    lift_to(0);
-    chassis.moveToPose(40, 15, 0, 1000);
-    chassis.moveToPose(60, 8, 270, 1000, {.forwards = false, .maxSpeed = 70});
-    chassis.moveToPose(60, 8, 180, 1000);
-    chassis.moveToPoint(60, 0, 1000, {.maxSpeed = 70}, false);
-    pros::delay(500);
-    close_claw();
-
-    // score that shi (same tihng)
-    chassis.moveToPoint(60, 8, 1000, {.forwards = false, .maxSpeed = 70}, false);
-    chassis.moveToPose(60, 8, 270, 1000);
-    // test this arc
-    chassis.moveToPose(40, 15, 0, 1000);
-    lift_to(900);
-    chassis.moveToPose(40, 15, -90, 1000);
-    chassis.moveToPoint(45, 15, 1000, {.maxSpeed = 70}, false);
-    open_claw();
-
 
 
     // grab cup pin on the field
