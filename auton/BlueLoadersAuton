@@ -130,8 +130,8 @@ void initialize() {
     liftL.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
     liftR.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
 
-    liftL.set_zero_position(0);
-    liftR.set_zero_position(0);
+    liftL.tare_position();
+    liftR.tare_position();
 
     std::cout << "left motors: %f" << left_motors.get_temperature() << "\nright motors: %f" << right_motors.get_temperature() << std::endl;
 
@@ -206,9 +206,11 @@ void autonomous() {
     lift_to(900);
     pros::delay(10000);
 	*/
-    // set position to x:0, y:0, heading:0
-    chassis.setPose(0, 0, 0);
-    
+    liftL.tare_position();
+    liftR.tare_position();
+
+    lift_to(150);
+
     // cycle loader to blue
     chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
     chassis.moveToPoint(0, -3, 500, {.forwards = false, .maxSpeed = 70}, false);
@@ -218,31 +220,31 @@ void autonomous() {
     // score preload
     chassis.moveToPose(0, 16, 0, 1000);
     chassis.moveToPose(0, 16, 90, 1000);
-    chassis.moveToPoint(16.5, 15, 500, {.maxSpeed = 55});
+    chassis.moveToPoint(17.5, 16, 500, {.maxSpeed = 60});
     chassis.waitUntilDone();
 
-    pros::delay(1000);
+    pros::delay(500);
+    lift_to(0);
 
     open_claw();
     pros::delay(500);
 
     // score cup + pin
-    chassis.moveToPoint(0, 13, 1000, {.forwards = false});
-    chassis.moveToPose(0, 13, 45, 1800);
-    chassis.waitUntilDone();
-    inertial_sensor.set_heading(45);
-    chassis.setPose(0, 0, 45);
+    chassis.moveToPoint(0, 16, 1000, {.forwards = false}, false);
+    chassis.setPose(0, 0, 90);
+    chassis.turnToPoint(20, 18, 1000);
     
     // grab it!!
-    chassis.moveToPoint(14.7, 21.3, 1500, {.maxSpeed = 50});
+    chassis.moveToPoint(18, 16, 1500, {.maxSpeed = 50});
+    chassis.moveToPoint(20, 18, 800, {.maxSpeed = 20});
     chassis.waitUntilDone();
     close_claw();
+    lift_to(150);
     pros::delay(500);
-    chassis.moveToPoint(21.5, 30, 1000);
-
-    chassis.moveToPose(21.5, 30, 168, 1000);
+    chassis.moveToPoint(25, 21, 1000, {.maxSpeed = 50}, false);
     lift_to(900);
-    chassis.moveToPoint(23, 12, 1000, {.maxSpeed = 60});
+    chassis.turnToPoint(25, 8, 1500);
+    chassis.moveToPoint(25, 8, 1000, {.maxSpeed = 60});
     chassis.waitUntilDone();
     pros::delay(1000);
     open_claw();
