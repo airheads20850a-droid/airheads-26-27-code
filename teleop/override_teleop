@@ -82,14 +82,14 @@ void on_center_button() {
 }
 
 //**TEST!!!!**
-void drive() {
+void drive(void* param) {
     
     while (true) {
         int leftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
         // move the robot
-        chassis.arcade(leftY, rightX);
+        chassis.arcade(leftY, rightX*0.8);
 
         pros::delay(25);
     }
@@ -111,12 +111,16 @@ void lift_stop() {
     liftR.brake();
 }
 
+
+bool clamping = false;
+
 // controls the cascade lift
-void cascade() {
+void cascade(void* param) {
+
     while (true) { 
         //int averageMotorDegree = (liftL.position() + liftR.position())/2;
 
-        // 100% is 127 rpm or 762 dps; 50% is 63.5 rpm or 381 dps
+
         // go UP
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
 
@@ -128,6 +132,11 @@ void cascade() {
 
             liftL.move(-127);
             liftR.move(-127);
+
+        } else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1) && !clamping && liftL.get_position() < 300) {
+            liftL.move_relative(100, 100);
+            liftR.move_relative(100, 100);
+
 
         } else {
             lift_stop();
@@ -145,20 +154,13 @@ void close_claw() {
 }
 
 // may need more debugging
-void control_claw() {
+void control_claw(void* param) {
 
-    bool clamping = false;
     while (true) {
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
 
             // turn claw on
             if (!clamping) {
-
-                //god i should really just use a motor group
-                if (liftL.get_position() < 300) {
-                    liftL.move_relative(100, 100);
-                    liftR.move_relative(100, 100);
-                }
                 close_claw();
 
             } else {
@@ -185,8 +187,8 @@ void initialize() {
 
     liftL.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
     liftR.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-    liftL.tare_position(0);
-    liftR.tare_position(0);
+    liftL.tare_position();
+    liftR.tare_position();
     liftL.move_velocity(100);
     liftR.move_velocity(100);
 
@@ -198,7 +200,7 @@ void initialize() {
 	pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
     // print position to brain screen
-    pros::Task screen_task([&]() {
+    new pros::Task([&]() {
         while (true) {
             // print robot location to the brain screen
             pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
@@ -206,12 +208,6 @@ void initialize() {
             pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
             pros::lcd::print(3, "lfitL: %f", liftL.get_position()); // y
             pros::lcd::print(4, "liftR: %f", liftR.get_position()); // heading
-            master.print(1, 0, "X: %f", chassis.getPose().x); // x
-            master.print(2, 0, "Y: %f", chassis.getPose().y); // y
-            master.print(3, 0, "Theta: %f", chassis.getPose().theta); // heading
-            //pros::Controller master (pros::E_CONTROLLER_MASTER);
-            
-            //master.print(0, 0, "theta: %f", chassis.getPose().theta);
 
             // delay to save resources
             pros::delay(50);
@@ -269,13 +265,13 @@ void autonomous() {
 void opcontrol() {
 
     // chassis
-    pros::Task drive(drive);
+    pros::Task drive_thread(drive);
 
     // lift
-    pros::Task cascade(cascade);
+    pros::Task cascade_thread(cascade);
 
     // claw
-    pros::Task control_claw(control_claw);
+    pros::Task control_claw_thread(control_claw);
 
 
 }
