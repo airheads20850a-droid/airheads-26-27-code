@@ -209,7 +209,7 @@ void autonomous() {
     liftL.tare_position();
     liftR.tare_position();
 
-    lift_to(150);
+    lift_to(125);
 
     // cycle loader to blue
     chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
@@ -239,23 +239,21 @@ void autonomous() {
     chassis.moveToPoint(20, 18, 800, {.maxSpeed = 20});
     chassis.waitUntilDone();
     close_claw();
-    lift_to(150);
-    pros::delay(500);
-    chassis.moveToPoint(25, 21, 1000, {.maxSpeed = 50}, false);
     lift_to(900);
-    chassis.turnToPoint(25, 8, 1500);
-    chassis.moveToPoint(25, 8, 1000, {.maxSpeed = 60});
+    chassis.moveToPoint(28, 21, 1000, {.maxSpeed = 50}, false);
+    chassis.turnToPoint(28, 5, 1000);
+    chassis.moveToPoint(28, 5, 1000, {.maxSpeed = 60});
     chassis.waitUntilDone();
-    pros::delay(1000);
+    lift_to(300);
+    pros::delay(500);
     open_claw();
 
-    // 
-    pros::delay(600);
+    // score
+    chassis.moveToPoint(28, 21, 1000, {.forwards = false});
+    pros::delay(250);
     close_claw();
-    pros::delay(100);
     lift_to(0);
-
-    chassis.moveToPoint(21.5, 30, 1000, {.forwards = false});
+    chassis.moveToPoint(5, -6, 2000, {.forwards = false});
 }
 
 /**
