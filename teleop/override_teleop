@@ -91,7 +91,7 @@ void drive(void* param) {
         // move the robot
         chassis.arcade(leftY, rightX*0.8);
 
-        pros::delay(25);
+        pros::delay(50);
     }
 }
 
@@ -117,31 +117,50 @@ bool clamping = false;
 // controls the cascade lift
 void cascade(void* param) {
 
+    bool macroing = false;
+    float targetPos = 0;
+    
+
     while (true) { 
         //int averageMotorDegree = (liftL.position() + liftR.position())/2;
 
 
         // go UP
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-
+            
+            macroing = false;
             liftL.move(127);
             liftR.move(127);
 
         // go DOWN
         } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
 
+            macroing = false;
             liftL.move(-127);
             liftR.move(-127);
 
-        } else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1) && !clamping && liftL.get_position() < 300) {
-            liftL.move_relative(100, 100);
-            liftR.move_relative(100, 100);
-
-
+        } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) && clamping && liftL.get_position() < 300) {
+            macroing = true;
+            float curPos = (liftL.get_position() + liftR.get_position())/2;
+            targetPos = curPos+100;
+            
         } else {
-            lift_stop();
+
+            if (macroing) {
+                float curPos = (liftL.get_position() + liftR.get_position())/2;
+                if (curPos < targetPos) {
+                    liftL.move(127);
+                    liftR.move(127);
+                } else {
+                    macroing = false;
+                    lift_stop(); 
+                }
+            } else {
+                lift_stop();
+            }
+            
         }
-        pros::delay(15);
+        pros::delay(20);
     }
 }
 
@@ -172,7 +191,7 @@ void control_claw(void* param) {
 
     }
 
-    pros::delay(15);
+    pros::delay(50);
 }
 
 /**
@@ -272,6 +291,12 @@ void opcontrol() {
 
     // claw
     pros::Task control_claw_thread(control_claw);
-
-
 }
+/*
+// chassis
+pros::Task drive_thread(drive);
+
+pros::Task cascade_thread(cascade);
+
+// claw
+pros::Task control_claw_thread(control_claw);*/
