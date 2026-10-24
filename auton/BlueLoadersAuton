@@ -97,16 +97,6 @@ void on_center_button() {
 void lift_to(int degrees) {
     liftL.move_absolute(degrees, 100);
     liftR.move_absolute(degrees, 100);
-
-    //doesnt work lmao
-    /*while (!((liftR.get_position() + liftL.get_position()) / 2 > degrees - 5 &&
-           (liftL.get_position() + liftR.get_position()) / 2 < degrees + 5)) {
-      pros::lcd::print(5, "avg: %f",
-                       (liftL.get_position() + liftR.get_position()) /
-                           2);                     // heading
-      pros::lcd::print(6, "degrees: %f", degrees); // heading
-      pros::delay(50);
-    }*/
 }
 
 void lift_move(int dir) {
@@ -139,6 +129,9 @@ void initialize() {
 
     liftL.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
     liftR.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+
+    liftL.tare_position();
+    liftR.tare_position();
 
     std::cout << "left motors: %f" << left_motors.get_temperature() << "\nright motors: %f" << right_motors.get_temperature() << std::endl;
 
@@ -185,10 +178,7 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {
-    liftL.tare_position();
-    liftR.tare_position();
-}
+void competition_initialize() {}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -203,71 +193,67 @@ void competition_initialize() {
  */
 
 void autonomous() {
-    // robot starts rotated
-    chassis.setPose(0, 0, -50);
+    /*
+    lift_move(1);
+    pros::delay(2000);
+    lift_stop();
 
+    pros::delay(2000);
+    lift_move(-1);
+    pros::delay(2000);
+    lift_stop();
 
-    //score preload
-    lift_to(150);
-    chassis.moveToPoint(-10, 10, 1000, {.maxSpeed = 50});
+    lift_to(900);
+    pros::delay(10000);
+	*/
+    liftL.tare_position();
+    liftR.tare_position();
+
+    lift_to(125);
+
+    // cycle loader to blue
+    chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
+    chassis.moveToPoint(0, -3, 500, {.forwards = false, .maxSpeed = 70}, false);
+    chassis.moveToPoint(0, 6, 500, {.maxSpeed = 70}, false);
+    chassis.moveToPoint(0, -3, 500, {.forwards = false, .maxSpeed = 70}, false);
+    
+    // score preload
+    chassis.moveToPose(0, 16, 0, 1000);
+    chassis.moveToPose(0, 16, 90, 1000);
+    chassis.moveToPoint(17.5, 16, 500, {.maxSpeed = 60});
     chassis.waitUntilDone();
-    lift_to(0);
+
     pros::delay(500);
-    open_claw();
+    lift_to(0);
 
-    // score field object (cup/pin 1)
-    chassis.moveToPoint(-2, 2, 1000, {.forwards = false, .maxSpeed = 30}, false);
-    chassis.turnToPoint(4, 7, 1000);
+    open_claw();
+    pros::delay(500);
+
+    // score cup + pin
+    chassis.moveToPoint(0, 16, 1000, {.forwards = false}, false);
+    chassis.setPose(0, 0, 90);
+    chassis.turnToPoint(20, 18, 1000);
+    
+    // grab it!!
+    chassis.moveToPoint(18, 16, 1500, {.maxSpeed = 50});
+    chassis.moveToPoint(20, 18, 800, {.maxSpeed = 20});
     chassis.waitUntilDone();
-    chassis.moveToPoint(4, 7, 1000, {.maxSpeed = 30}, false);
     close_claw();
     lift_to(900);
-    pros::delay(500);
-    chassis.moveToPoint(12, 12, 1000, {.maxSpeed = 40});
-
-    chassis.turnToHeading(-90, 1000);
-    chassis.moveToPoint(-12, 12, 1000, {.maxSpeed = 70}, false);
+    chassis.moveToPoint(28, 21, 1000, {.maxSpeed = 50}, false);
+    chassis.turnToPoint(28, 5, 1000);
+    chassis.moveToPoint(28, 5, 1000, {.maxSpeed = 60});
+    chassis.waitUntilDone();
     lift_to(300);
     pros::delay(500);
     open_claw();
 
-    // score a match load
-    chassis.moveToPoint(24, 12, 1000, {.forwards = false, .maxSpeed = 70}, false);
-    lift_to(0);
-    chassis.turnToHeading(-180, 1000);
-    chassis.waitUntilDone();
-    chassis.moveToPoint(24, 0, 1000, {.maxSpeed = 50}, false);
-    pros::delay(500);
-    close_claw();
-    lift_to(1800);
-
-    chassis.moveToPoint(24, 12, 1000, {.forwards = false, .maxSpeed = 50}, false);
-    chassis.turnToHeading(-90, 1000);
-    chassis.moveToPoint(-6, 12, 1000, {.maxSpeed = 70}, false);
-    chassis.moveToPoint(-12, 12, 1000, {.maxSpeed = 20}, false);
-    pros::delay(500);
-    lift_to(900);
-    pros::delay(500);
-    open_claw();
-
-
-    // grab a cone
-    chassis.moveToPoint(24, 12, 1000, {.forwards = false, .maxSpeed = 70}, false);
+    // score
+    chassis.moveToPoint(28, 21, 1000, {.forwards = false});
+    pros::delay(250);
     close_claw();
     lift_to(0);
-    chassis.turnToHeading(-180, 1000);
-    chassis.waitUntilDone();
-    chassis.moveToPoint(24, 0, 1000, {.maxSpeed = 50}, false);
-    pros::delay(1000);
-
-    chassis.moveToPose(12,12, 90, 1500, {.forwards = false});
-    chassis.turnToHeading(0, 1000);
-    chassis.waitUntilDone();
-    lift_to(150);
-    chassis.moveToPoint(12, 24, 1000, {.maxSpeed = 50}, false);
-    lift_to(0);
-    pros::delay(500);
-    open_claw();
+    chassis.moveToPoint(5, -6, 2000, {.forwards = false});
 }
 
 /**
