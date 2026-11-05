@@ -1,7 +1,7 @@
 #include "main.h"
 #include "lemlib/api.hpp" // IWYU pragma: keep
 
-//I AM SO COOOOOOOOOOOOL
+// hiiiiii
 pros::MotorGroup left_motors({6, 15, 16}, pros::MotorGearset::blue);
 pros::MotorGroup right_motors({-5, -7, -18}, pros::MotorGearset::blue);
 
